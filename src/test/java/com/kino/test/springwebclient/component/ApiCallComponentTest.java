@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @Import({TestWebClientConfig.class})
@@ -44,16 +43,24 @@ class ApiCallComponentTest {
 
         assertAll(() -> assertNotNull(wmsLoginRm));
     }
+
     @Test
     @DisplayName("다중 테스트")
-    public void multiOpenApiTest () {
-        List<CommonOpenApiPo> commonOpenApiPos = IntStream.rangeClosed(1, 100).mapToObj(i -> CommonOpenApiPo.builder().pageNo(i).build()).collect(Collectors.toList());
+    public void multiOpenApiTest() {
+        List<CommonOpenApiPo> commonOpenApiPos = IntStream.rangeClosed(1, 100)
+                .mapToObj(i -> CommonOpenApiPo.builder()
+                        .pageNo(i).build())
+                .collect(Collectors.toList());
 
         Flux<CommonOpenApiRm> commonOpenApiRmFlux = apiCallComponent.commonOpenApiMultiCall(commonOpenApiPos);
 
         List<CommonOpenApiRm> openApiRms = commonOpenApiRmFlux.toStream().collect(Collectors.toList());
-        
-        
+
+        assertAll(
+                () -> assertEquals(commonOpenApiPos.size(), openApiRms.size()),
+                () -> assertNotNull(openApiRms)
+        );
+
     }
 
 }
