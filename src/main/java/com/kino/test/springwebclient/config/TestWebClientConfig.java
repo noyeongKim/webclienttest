@@ -34,8 +34,6 @@ public class TestWebClientConfig {
      */
     @Bean
     public WebClient customWebClient() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         WebClient webClient = WebClient.builder()
                 .exchangeStrategies(this.getExchangeStrategies())
                 .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
@@ -86,9 +84,22 @@ public class TestWebClientConfig {
      * @return
      */
     public static ReactorClientHttpConnector getReactorClientHttpConnector() {
+        /**
+         * webclient 커넥션 정보 설정.
+         * 리드 타임, 커넥션 타임도 변경 가능하다.
+         *
+         * 해당 소스에서는 병렬(parallel) 호출에 대한 설정을 위주로 잡았다.
+         *
+         * maxConnections : 유지할 Connection Pool의 수
+         *                  - 기본값 : max(프로세서수, 8) * 2
+         *                  - 참고로 max 값 많큼 미리 생성해 놓지 않고 필요할때마다 생성한다. 말 그대로 최대 생성가능한 수이다.
+         *
+         * pendingAcquireMaxCount : Connection을 얻기 위해 대기하는 최대 수
+         *                          - 기본값 : 무제한 (-1)
+         */
         ConnectionProvider provider = ConnectionProvider.builder("provider")
-                .maxConnections(5)
-                .pendingAcquireMaxCount(50)
+                .maxConnections(50)                     // 병렬 호출시 1회에 호출할 최대 커넥션 수
+                .pendingAcquireMaxCount(-1)             // 병렬 호출 가능한 총 횟수, 미설정시 maxConnection * 2 이다.
                 .build();
 
         return new ReactorClientHttpConnector(

@@ -43,7 +43,7 @@ public class ApiCallComponent {
     }
 
     /**
-     *
+     * 대전 유성구 공기질 관측소 위치 조회 공공 api 호출 예시
      * @param commonOpenApiPo
      * @return
      */
@@ -57,6 +57,11 @@ public class ApiCallComponent {
                 .bodyToMono(CommonOpenApiRm.class);
     }
 
+    /**
+     * 대전 유성구 공기질 관측소 조회 공공 api 다중 호출 예시
+     * @param commonOpenApiPos
+     * @return
+     */
     public Flux<CommonOpenApiRm> commonOpenApiMultiCall(List<CommonOpenApiPo> commonOpenApiPos) {
         return Flux.fromIterable(commonOpenApiPos)
                 .parallel()
